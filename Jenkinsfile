@@ -24,7 +24,7 @@ pipeline {
                     if (env.TAG_NAME) {
                         // Buildato da tag git -> immagine = stesso tag git.
                         env.IMAGE_TAG = env.TAG_NAME
-                    } else if (env.BRANCH_NAME == 'master') {
+                    } else if (env.BRANCH_NAME == 'main') {
                         // Buildato da master -> latest.
                         env.IMAGE_TAG = 'latest'
                     } else if (env.BRANCH_NAME == 'develop') {

@@ -14,17 +14,6 @@ jenkins:
         - id: "{{ jenkins_admin_user }}"
           password: "{{ jenkins_admin_password }}"
 
-  credentials:
-  system:
-    domainCredentials:
-      - credentials:
-          - usernamePassword:
-              scope: GLOBAL
-              id: "{{ dockerhub_credentials_id }}"
-              username: "{{ dockerhub_username }}"
-              password: "{{ vault_dockerhub_token }}"
-              description: "Docker Hub access token per push immagini"
-              
   # --- AUTORIZZAZIONE ---
   # Adeguato a un lab a utente singolo. In produzione: matrix-auth o role-strategy.
   authorizationStrategy:
@@ -56,3 +45,14 @@ jenkins:
 unclassified:
   location:
     url: "{{ jenkins_controller_url }}"
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: GLOBAL
+              id: "{{ dockerhub_credentials_id }}"
+              username: "{{ dockerhub_username }}"
+              password: "{{ vault_dockerhub_token }}"
+              description: "Docker Hub access token per push immagini"

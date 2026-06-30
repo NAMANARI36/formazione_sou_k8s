@@ -56,3 +56,9 @@ credentials:
               username: "{{ dockerhub_username }}"
               password: "{{ vault_dockerhub_token }}"
               description: "Docker Hub access token per push immagini"
+          - usernamePassword:
+              scope: GLOBAL
+              id: "{{ github_credentials_id }}"
+              username: "{{ github_username }}"
+              password: "{{ vault_github_token }}"
+              description: "GitHub token per scan repository"

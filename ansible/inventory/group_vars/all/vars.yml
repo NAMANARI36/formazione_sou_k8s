@@ -13,6 +13,9 @@ ansible_python_interpreter: /usr/bin/python3
 dockerhub_credentials_id: dockerhub-credentials
 dockerhub_username: namanari36
 
+github_credentials_id: github-credentials
+github_username: NAMANARI36
+
 # region Rete Podman
 # Variabili della rete Podman che sarà creata sul nodo gestito da Ansible.
 podman_network_name: jenkins-net

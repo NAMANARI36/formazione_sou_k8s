@@ -62,7 +62,7 @@ pipeline {
                 sh '''
                     podman --remote build \
                         -t ${IMAGE_NAME}:${IMAGE_TAG} \
-                        -f Dockerfile .
+                        -f /app/Dockerfile .
                 '''
             }
         }

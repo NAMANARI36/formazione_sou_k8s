@@ -1,0 +1,78 @@
+// Blocco radice che apre la pipeline
+pipeline {
+    // Definisce su quale nodo far girare la pipeline, in questo caso su qualsiasi nodo che abbia il tag "build"
+    agent { label 'build' }
+
+    // Definisce parametri della pipeline, che possono essere passati dall'utente al momento della build
+    // I parametri sono accessibili in tutta la pipeline attraverso l'oggetto params o attraverso l'oggeetto env
+    // Definisce i parametri della pipeline, il cui valore viene fornito all'avvio della build.
+    parameters {
+        string(
+            name: 'IMAGE_TAG',
+            defaultValue: 'v1.1.0',
+            description: 'Tag dell\'immagine Docker da deployare'
+        )
+    }
+
+    // Definisce variabili d'ambiente valide in tutta la pipeline. Ogni stage può accedere ai valori definiti attraverso l'oggetto env
+    // L'oggetto env contiene sia le variabili di ambiente definite in environment, sia le variabili create automaticamente da jenkins
+    environment {
+        // Percorso del chart nella repo
+        CHART_DIR       = 'charts/flask-app'
+
+        // Nome della release Helm
+        RELEASE_NAME    = 'flask-app'
+
+        // Namespace di destinazione sul cluster.
+        NAMESPACE       = 'formazione-sou'
+
+        // ID della credential Jenkins(Secret file) che contiene il kubeconfig.
+        KUBECONFIG_CRED = 'kubeconfig-formazione-sou'
+    }
+
+    // Definisce i vari stage della pipeline, ogni stage presenta un nome ed è composto da vari steps
+    stages {
+        // Scarica i file della repo nella workspace dell'agent
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        // Validazione della struttura del chart
+        stage('Helm lint') {
+            steps {
+                sh 'helm lint ${CHART_DIR}'
+            }
+        }
+
+        // Deploy su cluster.
+        stage('Helm install') {
+            steps {
+            // Il blocco withCredentials associa in modo sicuro le credenziali memorizzate da Jenkins
+            // a variabili d'ambiente, disponibili solo all'interno del suo scope.
+            // file è il tipo di credenzials Jenkins che scrive il contenuto del segreto
+            // in un file temporaneo sull'agent.
+            // variable riceve il percorso relativo a quel file temporaneo
+            // Assegnandolo alla variabile d'ambiente KUBECONFIG
+            // kubectl e helm leggono automaticamente la variabile d'ambiente che contiene il percorso al file (kubeconfig)
+                withCredentials([file(
+                    credentialsId: "${KUBECONFIG_CRED}",
+                    variable: 'KUBECONFIG'
+                )]) {
+                    // --create-namespace crea il namespace se assente.
+                    // --set image.tag sovrascrive il valore di default del chart col tag scelto.
+                    // --wait attende che i Pod siano in stato Ready prima di considerare il deploy riuscito.
+                    sh '''
+                        helm upgrade --install ${RELEASE_NAME} ${CHART_DIR} \
+                            --namespace ${NAMESPACE} \
+                            --create-namespace \
+                            --set image.tag=${IMAGE_TAG} \
+                            --wait \
+                            --timeout 46s
+                    '''
+                }
+            }
+        }
+    }
+}

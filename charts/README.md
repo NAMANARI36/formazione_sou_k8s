@@ -1,1 +1,0 @@
-un Chart è un pacchetto versionato di template di risorse Kubernetes correlate, con i relativi valori di configurazione, che Helm renderizza e installa su un cluster come un'unità gestibile

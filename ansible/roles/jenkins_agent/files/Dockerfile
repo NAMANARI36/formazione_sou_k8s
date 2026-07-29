@@ -11,12 +11,12 @@ USER root
 RUN apt-get update \
     && apt-get install -y --no-install-recommends podman 
 
-# Scarico il binario di kubectl e lo rendo eseguibile
+# Scarica il binario di kubectl e lo rende eseguibile
 RUN curl -fsSL -o /usr/local/bin/kubectl \
         "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
     && chmod +x /usr/local/bin/kubectl
 
-# Scarico lo script di download di helm e lo eseguo per installare helm
+# Scarica lo script di download di helm e lo esegue per installare helm
 RUN curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
         | bash
 
